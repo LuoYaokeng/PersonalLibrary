@@ -13,8 +13,9 @@ const getBooks = () => {
   })
 }
 
-const value = ref('')
-const options = [
+// const value = ref('')
+// 借阅人枚举
+const borrower_options = [
   {
     value: 'luoyaokeng',
     label: '铿',
@@ -25,8 +26,29 @@ const options = [
   },
 ]
 
-const defaultTime = new Date(2000, 1, 1, 12, 0, 0)
+// 书本状态枚举
+const book_status_options = [
+  {
+    value:'0',
+    label:'想看'
+  },
+  {
+    value:'1',
+    label:'在借'
+  },
+  {
+    value:'2',
+    label:'已还'
+  }
+];
 
+// 通用的value转label显示
+const getLabelByValue = (value,options)=>{
+  const enumItem = options.find(item => item.value === value);
+  return enumItem ? enumItem.label : '';
+}
+
+// 日历快捷选择
 const shortcuts = [
   {
     text: 'Today',
@@ -75,7 +97,7 @@ const book_form = reactive({
   book_status: ""
 })
 
-
+// 提交表单
 const submitForm = (formEl) => {
   console.log(formEl);
   axios.post(`http://127.0.0.1:5000/books`, book_form).then(() => {
@@ -119,9 +141,9 @@ const submitEditForm = (formEl)=>{
   })
 }
 
-
-
 </script>
+
+
 
 <template>
   <div style="margin:0 auto;width:50%;">
@@ -133,10 +155,18 @@ const submitEditForm = (formEl)=>{
       <el-table-column label="编号" prop="book_id" />
       <el-table-column label="书名" prop="book_title" />
       <el-table-column label="作者" prop="book_author" />
-      <el-table-column label="借阅人" prop="book_borrower_id" />
+      <el-table-column label="借阅人" prop="book_borrower_id">
+        <template #default="scope">
+          {{ getLabelByValue(scope.row.book_borrower_id, borrower_options) }}
+        </template>
+      </el-table-column>
       <el-table-column label="借阅日期" prop="book_borrow_date" />
       <el-table-column label="应还日期" prop="book_return_date" />
-      <el-table-column label="状态" prop="book_status" />
+      <el-table-column label="状态" prop="book_status">
+        <template #default="scope">
+          {{ getLabelByValue(scope.row.book_status, book_status_options) }}
+        </template>
+      </el-table-column>
       <el-table-column align="right" label="操作" width="200px">
         <template #default="scope">
           <el-button size="small" @click="handleEdit(scope.$index, scope.row)">
@@ -172,7 +202,7 @@ const submitEditForm = (formEl)=>{
       <el-form-item label="借阅人" prop="book_borrower_id">
         <el-select v-model="book_form.book_borrower_id" clearable placeholder="请选择借阅人">
           <el-option
-            v-for="item in options"
+            v-for="item in borrower_options"
             :key="item.value"
             :label="item.label"
             :value="item.value"
@@ -200,7 +230,14 @@ const submitEditForm = (formEl)=>{
         />
       </el-form-item>
       <el-form-item label="状态" prop="book_status">
-        <el-input v-model="book_form.book_status" autocomplete="off" />
+        <el-select v-model="book_form.book_status" clearable placeholder="">
+          <el-option
+            v-for="item in book_status_options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitForm(ruleFormRef)">提交</el-button>
@@ -230,7 +267,7 @@ const submitEditForm = (formEl)=>{
       <el-form-item label="借阅人" prop="book_borrower_id">
         <el-select v-model="book_form.book_borrower_id" clearable placeholder="请选择借阅人">
           <el-option
-            v-for="item in options"
+            v-for="item in borrower_options"
             :key="item.value"
             :label="item.label"
             :value="item.value"
@@ -258,7 +295,14 @@ const submitEditForm = (formEl)=>{
         />
       </el-form-item>
       <el-form-item label="状态" prop="book_status">
-        <el-input v-model="book_form.book_status" autocomplete="off" />
+        <el-select v-model="book_form.book_status" clearable placeholder="">
+          <el-option
+            v-for="item in book_status_options"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button type="primary" @click="submitEditForm(editFormRef)">提交</el-button>
